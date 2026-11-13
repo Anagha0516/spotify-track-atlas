@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f4ef" />
+    <title>Track Atlas | Spotify catalogue analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Track Atlas home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>track<span class="brand-light">atlas</span></span>
+      </a>
+      <div class="topbar-note"><span class="live-dot"></span> SPOTIFY TRACK DATASET <span class="topbar-divider">/</span> 114 GENRES</div>
+    </header>
+
+    <main class="page-shell">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">A catalogue, in four moods</p>
+          <h1>Find the feeling<br /><em>behind the numbers.</em></h1>
+          <p class="intro-copy">Explore how a track sounds, where its energy sits, and which songs rise to the top of Spotify's popularity score.</p>
+        </div>
+        <div class="intro-stamp" aria-label="Dataset overview">
+          <span class="stamp-orbit orbit-one"></span>
+          <span class="stamp-orbit orbit-two"></span>
+          <span class="stamp-center">SOUND<br />/ DATA</span>
+          <span class="stamp-caption">A closer listen<br />to the catalogue</span>
+        </div>
+      </section>
+
+      <form class="filters" action="/" method="GET">
+        <label class="search-field">
+          <span class="field-label">SEARCH THE CATALOGUE</span>
+          <span class="search-control"><span class="search-icon" aria-hidden="true"></span><input type="search" name="q" value="<%= search %>" placeholder="Track, artist or album" /></span>
+        </label>
+        <label>
+          <span class="field-label">MOOD</span>
+          <select name="mood">
+            <option value="">All moods</option>
+            <% analytics.moodCounts.forEach((mood) => { %>
+              <option value="<%= mood.label %>" <%= selectedMood === mood.label ? 'selected' : '' %>><%= mood.label %></option>
+            <% }) %>
+          </select>
+        </label>
+        <label>
+          <span class="field-label">GENRE</span>
+          <select name="genre">
+            <option value="">All genres</option>
+            <% genres.forEach((genre) => { %>
+              <option value="<%= genre %>" <%= selectedGenre === genre ? 'selected' : '' %>><%= genre %></option>
+            <% }) %>
+          </select>
+        </label>
+        <button class="filter-button" type="submit">Explore <span aria-hidden="true">-&gt;</span></button>
+        <% if (analytics.filtered) { %><a class="clear-link" href="/">Clear</a><% } %>
+      </form>
+
+      <section class="stats-row" aria-label="Dataset summary">
+        <article class="stat stat-primary">
+          <span class="stat-label">TRACKS IN VIEW</span>
+          <strong><%= analytics.total.toLocaleString() %></strong>
+          <span class="stat-foot">unique recordings</span>
+        </article>
+        <article class="stat">
+          <span class="stat-label">AVG. POPULARITY</span>
+          <strong><%= analytics.averagePopularity.toFixed(1) %><small>/100</small></strong>
+          <span class="stat-foot">Spotify popularity score</span>
+        </article>
+        <article class="stat">
+          <span class="stat-label">DOMINANT MOOD</span>
+          <strong class="mood-stat" style="--mood-color: <%= analytics.dominantMoodColor %>"><%= analytics.dominantMood %></strong>
+          <span class="stat-foot">inferred from sound features</span>
+        </article>
+        <article class="stat">
+          <span class="stat-label">AVERAGE ENERGY</span>
+          <strong><%= Math.round(analytics.averageEnergy * 100) %><small>/100</small></strong>
+          <span class="stat-foot">audio feature average</span>
+        </article>
+      </section>
+
+      <section class="analysis-grid">
+        <article class="panel mood-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">01 / THE EMOTIONAL MAP</p><h2>Every mood has<br />a tempo.</h2></div>
+            <span class="panel-index">VALENCE × ENERGY</span>
+          </div>
+          <div class="mood-map">
+            <% analytics.moodCounts.forEach((mood) => { %>
+              <div class="mood-cell mood-<%= mood.label.toLowerCase() %>">
+                <div class="mood-cell-top"><span class="mood-dot"></span><span class="mood-total"><%= mood.count.toLocaleString() %></span></div>
+                <strong><%= mood.label %></strong>
+                <span class="mood-description"><%= mood.description %></span>
+              </div>
+            <% }) %>
+          </div>
+          <div class="axis-labels"><span>LOW VALENCE</span><span>HIGH VALENCE</span></div>
+          <p class="chart-note">Mood is estimated from valence (musical positivity) and energy (intensity), split at 0.50.</p>
+        </article>
+
+        <article class="panel genre-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">02 / WHERE IT LIVES</p><h2>Genre<br />landscape.</h2></div>
+            <span class="panel-index">TOP 6</span>
+          </div>
+          <% if (analytics.topGenres.length) { %>
+            <ol class="genre-list">
+              <% analytics.topGenres.forEach((genre, index) => { %>
+                <li>
+                  <span class="genre-rank">0<%= index + 1 %></span>
+                  <span class="genre-name"><%= genre.label %></span>
+                  <span class="genre-count"><%= genre.count.toLocaleString() %></span>
+                  <span class="genre-track"><span style="width: <%= Math.round(genre.count / analytics.topGenreMax * 100) %>%"></span></span>
+                </li>
+              <% }) %>
+            </ol>
+          <% } else { %><p class="empty-state">No genres match these filters.</p><% } %>
+          <div class="genre-foot"><span>TRACKS PER GENRE</span><span>0<%= analytics.topGenres.length %> SHOWN</span></div>
+        </article>
+      </section>
+
+      <section class="panel songs-panel">
+        <div class="songs-heading">
+          <div><p class="eyebrow">03 / THE MOST RECOGNIZED</p><h2>Popular, by the numbers.</h2><p class="section-copy">Top unique recordings ranked by Spotify popularity score.</p></div>
+          <span class="panel-index">TOP <%= analytics.topSongs.length %> / <%= analytics.total.toLocaleString() %></span>
+        </div>
+        <% if (analytics.topSongs.length) { %>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th class="rank-column">#</th><th>TRACK</th><th>MOOD</th><th>GENRE</th><th class="score-heading">POPULARITY</th></tr></thead>
+              <tbody>
+                <% analytics.topSongs.forEach((song, index) => { %>
+                  <tr>
+                    <td class="rank-column"><span class="row-rank <%= index < 3 ? 'rank-highlight' : '' %>"><%= String(index + 1).padStart(2, '0') %></span></td>
+                    <td><div class="track-cell"><span class="track-art" style="--art-hue: <%= (index * 37 + song.popularity * 3) % 360 %>"><span></span></span><span class="track-copy"><strong><%= song.title %></strong><small><%= song.artist %></small></span></div></td>
+                    <td><span class="mood-pill mood-pill-<%= song.mood.toLowerCase() %>"><%= song.mood %></span></td>
+                    <td class="table-genre"><%= song.genre %></td>
+                    <td><div class="score-cell"><span class="score-value"><%= song.popularity %></span><span class="score-bar"><span style="width: <%= song.popularity %>%"></span></span></div></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %><div class="empty-table">No tracks match this search. Try another artist, title, mood, or genre.</div><% } %>
+        <p class="popularity-note">Popularity is Spotify's 0-100 relative popularity metric. The dataset does not include stream counts, so this is not a play-count ranking.</p>
+      </section>
+
+      <footer class="page-footer"><span>TRACK ATLAS <span class="footer-dot">/</span> AUDIO FEATURES, MADE VISIBLE</span><span>MOOD IS AN ESTIMATE, NOT A LABEL.</span></footer>
+    </main>
+  </body>
+</html>

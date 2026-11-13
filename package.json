@@ -1,0 +1,16 @@
+{
+  "name": "song-recommendation-site",
+  "version": "1.0.0",
+  "description": "Interactive Spotify catalogue mood and popularity dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "csv-parse": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.1",
+    "express": "^4.21.2"
+  }
+}
