@@ -41,6 +41,16 @@ tracks based on popularity, energy, valence, mood and genre.
 ## Dataset
 Uses a Spotify tracks dataset containing audio
 features and popularity information.
+## Dashboard Preview
+
+### 1. Main Analytics Dashboard
+![Spotify Track Atlas Dashboard](screenshots/dashboard.png)
+
+### 2. Mood Classification and Genre Distribution
+![Mood Classification](screenshots/Mood%20Classification.png)
+
+### 3. Spotify Tracks Ranked by Popularity
+![Tracks Ranked by Popularity](screenshots/Spotify%20Tracks%20Ranked%20by%20Popularity.png)
 
 ## Author
 Anagha Pai
